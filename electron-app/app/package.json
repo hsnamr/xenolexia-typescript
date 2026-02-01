@@ -13,7 +13,7 @@
     "electron:dev": "ELECTRON=true webpack --mode development && NODE_ENV=development ELECTRON_DISABLE_SANDBOX=1 electron .",
     "electron:test": "npm run build:assets && ELECTRON_DISABLE_SANDBOX=1 electron .",
     "electron:build": "npm run build:assets && electron-builder",
-    "electron:build:linux": "npm run build:assets && electron-builder --linux",
+    "electron:build:linux": "bash scripts/build-linux.sh",
     "electron:build:mac": "npm run build:assets && electron-builder --mac",
     "electron:build:win": "npm run build:assets && electron-builder --win",
     "build:linux:deb": "npm run build:assets && electron-builder --linux --config.linux.target=deb",
