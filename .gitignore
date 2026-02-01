@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# OS
+.DS_Store
+
+# Rebuildable release / build artifacts (exceed GitHub 100MB limit)
+react-native/release/
+
+# Android build outputs (APK etc. can be rebuilt)
+react-native/android/app/build/
+react-native/packages/mobile/android/app/build/
