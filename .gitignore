@@ -4,9 +4,36 @@ node_modules/
 # OS
 .DS_Store
 
-# Rebuildable release / build artifacts (exceed GitHub 100MB limit)
-react-native/release/
+# --- Rebuildable / generated (large binaries, build outputs) ---
+# Electron: release builds, app dist, TS build info
+electron/release/
+electron/app/dist/
+electron/lib/*.tsbuildinfo
+*.AppImage
+*.dmg
+*.exe
+*.deb
+*.rpm
+*.asar
 
-# Android build outputs (APK etc. can be rebuilt)
+# React Native: release, Android build/gradle, desktop dist, Windows bundles
+react-native/release/
 react-native/android/app/build/
+react-native/android/.gradle/
 react-native/packages/mobile/android/app/build/
+react-native/packages/desktop/dist/
+react-native/windows/
+
+# ts-core: compiled output
+ts-core/dist/
+*.tsbuildinfo
+
+# Generic build/output
+build/
+dist/
+out/
+.next/
+*.bundle
+*.pak
+*.so
+*.bin
