@@ -1,42 +1,37 @@
-# Xenolexia-TypeScript Monorepo Confirmation
+# Xenolexia-TypeScript Monorepo
 
-## 1. Confirmation: Monorepo of Three (Former) Git Repos
+## Structure
 
-**xenolexia-typescript** is a **monorepo** containing three workspaces:
+**xenolexia-typescript** is a **monorepo** containing three projects:
 
-| Workspace   | Package name           | Description |
-|------------|------------------------|-------------|
-| **electron**   | xenolexia-electron   | Electron desktop app (app + lib) |
-| **react-native** | xenolexia-react     | React Native mobile app |
-| **ts-core**    | xenolexia-typescript | Shared TypeScript core (types, algorithms, services) |
+| Project            | Package name           | Description |
+|--------------------|------------------------|-------------|
+| **ts-shared-core** | xenolexia-typescript   | Shared core logic (types, algorithms, services) used by both Electron and React Native apps. Platform-agnostic with injectable I/O. |
+| **electron-app**   | xenolexia-electron     | Electron desktop app (macOS, Windows, Linux). Uses ts-shared-core via `electron-app/lib` adapters. |
+| **react-native-app** | xenolexia             | React Native app (iOS, Android, Web). Uses ts-shared-core for shared functionality. |
 
-- **Root** `package.json` declares `workspaces: ["ts-core", "react-native", "electron"]` and is named `xenolexia-monorepo`.
-- **electron**, **react-native**, and **ts-core** were previously separate git repositories (each had its own `.git`). They have been merged into this single repo: nested `.git` directories were removed so the parent repo tracks all file content as one history.
-- **react-native** depends on **ts-core** via `"xenolexia-typescript": "file:../ts-core"`.
+## Wiring
 
-## 2. Push to GitHub
+- **ts-shared-core**: Builds to `dist/`. Exports `main: dist/index.js`, `types: dist/index.d.ts`. No app-specific code.
+- **electron-app**: Internal workspaces `app` and `lib`. `lib` (`@xenolexia/shared`) depends on `xenolexia-typescript` (ts-shared-core) and provides Electron adapters (file system, key-value store). The Electron app package depends on `@xenolexia/shared`.
+- **react-native-app**: Depends on `xenolexia-typescript` (file:../ts-shared-core) for shared core. Platform code (React Native, Web) lives in the app.
 
-- **Remote added:** `origin` → `git@github.com:hsnamr/xenolexia-typescript.git`
-- **Initial commit created:** "Monorepo: electron, react-native, ts-core" (root docs, package.json, and full content of electron/, react-native/, ts-core/; root `node_modules/` excluded via `.gitignore`).
+## Build targets
 
-**Push** from your machine:
+- **Electron**: macOS (dir, dmg), Windows (nsis, portable), Linux (AppImage, deb, rpm, pacman, tar.gz).
+- **React Native**: iOS, Android, Web (webpack).
 
-```bash
-cd xenolexia-typescript
-git push -u origin master
-```
+## Root scripts
 
-If push fails (e.g. `send-pack: unexpected disconnect`), check:
+From repo root (after `npm install`):
 
-- SSH key: `ssh -T git@github.com`
-- Network / firewall
-- Repo size; push again or use a stable connection
+- `npm run build:core` — build ts-shared-core
+- `npm run build:electron:linux` — build core then Electron Linux
+- `npm run build:electron:mac` — build core then Electron macOS
+- `npm run build:electron:win` — build core then Electron Windows
+- `npm run build:web` — build core then React Native web bundle
 
-If the default branch on GitHub is `main`, either rename locally and push:
+## Remote
 
-```bash
-git branch -m master main
-git push -u origin main
-```
-
-or create the repo on GitHub with default branch `master` first.
+- **Origin:** `git@github.com:hsnamr/xenolexia-typescript.git`
+- Default branch: `main`

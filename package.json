@@ -1,0 +1,23 @@
+{
+  "name": "xenolexia-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Xenolexia monorepo: electron-app, react-native-app, ts-shared-core",
+  "workspaces": [
+    "ts-shared-core",
+    "electron-app",
+    "react-native-app"
+  ],
+  "scripts": {
+    "build:core": "npm run build -w ts-shared-core",
+    "build:electron": "npm run build:core && npm run electron:build -w xenolexia-electron",
+    "build:electron:linux": "npm run build:core && npm run electron:build:linux -w xenolexia-electron",
+    "build:electron:mac": "npm run build:core && npm run electron:build:mac -w xenolexia-electron",
+    "build:electron:win": "npm run build:core && npm run electron:build:win -w xenolexia-electron",
+    "build:web": "npm run build:core && npm run web:build -w xenolexia",
+    "test": "npm run test -w ts-shared-core && npm run test -w xenolexia-electron && npm run test -w xenolexia"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

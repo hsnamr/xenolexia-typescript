@@ -5,10 +5,10 @@ node_modules/
 .DS_Store
 
 # --- Rebuildable / generated (large binaries, build outputs) ---
-# Electron: release builds, app dist, TS build info
-electron/release/
-electron/app/dist/
-electron/lib/*.tsbuildinfo
+# electron-app: release builds, app dist, TS build info
+electron-app/release/
+electron-app/app/dist/
+electron-app/lib/*.tsbuildinfo
 *.AppImage
 *.dmg
 *.exe
@@ -16,16 +16,15 @@ electron/lib/*.tsbuildinfo
 *.rpm
 *.asar
 
-# React Native: release, Android build/gradle, desktop dist, Windows bundles
-react-native/release/
-react-native/android/app/build/
-react-native/android/.gradle/
-react-native/packages/mobile/android/app/build/
-react-native/packages/desktop/dist/
-react-native/windows/
+# react-native-app: release, Android build/gradle, iOS build, web dist
+react-native-app/release/
+react-native-app/android/app/build/
+react-native-app/android/.gradle/
+react-native-app/ios/build/
+react-native-app/dist/
 
-# ts-core: compiled output
-ts-core/dist/
+# ts-shared-core: compiled output
+ts-shared-core/dist/
 *.tsbuildinfo
 
 # Generic build/output
