@@ -1,0 +1,122 @@
+# ============================================================================
+# Xenolexia .gitignore
+# ============================================================================
+
+# ==================== OS Generated ====================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ==================== Node ====================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.yarn/
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# ==================== Build Outputs ====================
+build/
+dist/
+*.bundle
+*.jsbundle
+
+# ==================== React Native ====================
+.expo/
+*.hbc
+
+# ==================== iOS ====================
+ios/Pods/
+ios/build/
+ios/DerivedData/
+ios/*.xcworkspace
+!ios/*.xcworkspace/contents.xcworkspacedata
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.xcuserstate
+*.dSYM
+*.dSYM.zip
+
+# ==================== Android ====================
+android/.gradle/
+android/build/
+android/app/build/
+android/app/release/
+android/local.properties
+android/captures/
+android/*.iml
+*.apk
+*.aab
+*.keystore
+!debug.keystore
+
+# ==================== IDE ====================
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# ==================== Testing ====================
+coverage/
+.nyc_output/
+junit.xml
+
+# ==================== Environment ====================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.local
+
+# ==================== Metro ====================
+.metro-health-check*
+
+# ==================== Temporary ====================
+*.log
+*.tmp
+*.temp
+.cache/
+
+# ==================== TypeScript ====================
+*.tsbuildinfo
+
+# ==================== Fastlane ====================
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# ==================== Buck ====================
+buck-out/
+\.buckd/
+*.keystore
+!debug.keystore
+
+# ==================== CocoaPods ====================
+# We recommend against adding the Pods directory to your .gitignore.
+# However, you should judge for yourself.
+# ios/Pods/
