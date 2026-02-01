@@ -4,7 +4,7 @@
 
 import React, {useEffect, useRef, useCallback} from 'react';
 import type {Book, ForeignWordData} from '@xenolexia/shared/types';
-import {generateInjectedScript, generateForeignWordStyles} from '@xenolexia/shared/services/TranslationEngine/InjectedScript';
+import {generateInjectedScript, generateForeignWordStyles} from '@xenolexia/shared/services/TranslationEngine';
 import './ReaderContent.css';
 
 interface ReaderContentProps {

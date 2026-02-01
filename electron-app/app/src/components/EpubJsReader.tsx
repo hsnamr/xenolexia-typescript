@@ -7,8 +7,10 @@
 
 import React, {useEffect, useRef, useImperativeHandle, forwardRef, useCallback} from 'react';
 import type {Book, ForeignWordData} from '@xenolexia/shared/types';
-import {createTranslationEngine} from '@xenolexia/shared/services/TranslationEngine/TranslationEngine';
-import {generateForeignWordStyles} from '@xenolexia/shared/services/TranslationEngine/InjectedScript';
+import {
+  createTranslationEngine,
+  generateForeignWordStyles,
+} from '@xenolexia/shared/services/TranslationEngine';
 
 // epub.js (BSD-2-Clause, GPL-compatible) - open-source EPUB renderer
 // eslint-disable-next-line @typescript-eslint/no-var-requires

@@ -57,7 +57,14 @@ module.exports = {
   },
   resolve: {
     extensions: ['.web.tsx', '.web.ts', '.web.js', '.tsx', '.ts', '.js'],
+    modules: [
+      path.resolve(appDirectory, 'node_modules'),
+      path.resolve(__dirname, '../node_modules'),
+      path.resolve(__dirname, '../../node_modules'),
+    ],
     alias: {
+      // Resolve shared core to built dist so re-exports work when bundling lib
+      'xenolexia-typescript': path.resolve(__dirname, '../../ts-shared-core/dist'),
       '@xenolexia/shared': path.resolve(__dirname, '../lib/src'),
       '@': path.resolve(appDirectory, 'src'),
       '@components': path.resolve(appDirectory, 'src/components'),
@@ -99,6 +106,11 @@ module.exports = {
     new webpack.NormalModuleReplacementPlugin(
       /[\\/]DatabaseService\.electron(\.ts)?$/,
       path.resolve(__dirname, 'src/services/DatabaseService.renderer.ts'),
+    ),
+    // electron-store is main-process only; stub for renderer bundle
+    new webpack.NormalModuleReplacementPlugin(
+      /^electron-store$/,
+      path.resolve(__dirname, 'src/mocks/empty-node-module.js'),
     ),
     // Rewrite node: protocol requests to polyfill paths so webpack doesn't hit UnhandledSchemeError
     new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
