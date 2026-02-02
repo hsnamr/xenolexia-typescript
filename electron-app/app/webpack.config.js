@@ -6,10 +6,17 @@ const appDirectory = path.resolve(__dirname);
 const isDev = process.env.NODE_ENV !== 'production';
 const isElectron = process.env.ELECTRON === 'true';
 
-// Babel loader configuration
+// Path/regex for ts-shared-core dist (CJS); match by path segment so rule applies regardless of resolution context
+const tsSharedCoreDist = path.resolve(__dirname, '../../ts-shared-core/dist');
+const tsSharedCoreDistRegex = /[\\/]ts-shared-core[\\/]dist[\\/]/;
+
+// CJS packages in node_modules that use require() and must be parsed as CommonJS (e.g. @lingo-reader/mobi-parser, fflate)
+const cjsNodeModulesRegex = /[\\/]node_modules[\\/](@lingo-reader[\\/]|fflate[\\/])/;
+
+// Babel loader configuration (exclude node_modules and ts-shared-core dist so CJS stays CJS)
 const babelLoaderConfiguration = {
   test: /\.(js|jsx|ts|tsx)$/,
-  exclude: /node_modules/,
+  exclude: [/node_modules/, /[\\/]ts-shared-core[\\/]dist[\\/]/],
   use: {
     loader: 'babel-loader',
     options: {
@@ -53,7 +60,40 @@ module.exports = {
     clean: true,
   },
   module: {
-    rules: [babelLoaderConfiguration, imageLoaderConfiguration, fontLoaderConfiguration, cssLoaderConfiguration],
+    rules: [
+      // ts-shared-core dist is pre-built CJS; match by path so rule applies when resolved via alias
+      {
+        test: /\.js$/,
+        include: tsSharedCoreDistRegex,
+        type: 'javascript/auto',
+        resolve: { fullySpecified: false },
+        parser: {
+          javascript: {
+            commonjsMagicComments: true,
+            commonjsExports: true,
+            commonjsRequire: true,
+          },
+        },
+      },
+      // CJS packages in node_modules (e.g. @lingo-reader/mobi-parser, fflate) that use require()
+      {
+        test: /\.js$/,
+        include: cjsNodeModulesRegex,
+        type: 'javascript/auto',
+        resolve: { fullySpecified: false },
+        parser: {
+          javascript: {
+            commonjsMagicComments: true,
+            commonjsExports: true,
+            commonjsRequire: true,
+          },
+        },
+      },
+      babelLoaderConfiguration,
+      imageLoaderConfiguration,
+      fontLoaderConfiguration,
+      cssLoaderConfiguration,
+    ],
   },
   resolve: {
     extensions: ['.web.tsx', '.web.ts', '.web.js', '.tsx', '.ts', '.js'],

@@ -268,7 +268,8 @@ function setupIpcHandlers() {
   let databaseService = null;
   function getDatabaseService() {
     if (!databaseService) {
-      const sharedRoot = path.dirname(require.resolve('@xenolexia/shared/package.json'));
+      // Lib path relative to this script (app/electron/main.js -> ../lib)
+      const sharedRoot = path.resolve(__dirname, '..', '..', 'lib');
       const dbPath = path.join(sharedRoot, 'src/services/StorageService/DatabaseService.electron.ts');
       databaseService = require(dbPath).databaseService;
     }

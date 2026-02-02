@@ -24,7 +24,7 @@ module.exports = {
   
   // Module name mapping (monorepo ts-core + path aliases)
   moduleNameMapper: {
-    '^xenolexia-typescript$': '<rootDir>/../../ts-core',
+    '^xenolexia-typescript$': '<rootDir>/../../ts-shared-core',
     '^@xenolexia/shared/(.*)$': '<rootDir>/src/$1',
     '^@services/(.*)$': '<rootDir>/src/services/$1',
   },

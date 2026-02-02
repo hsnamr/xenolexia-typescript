@@ -70,7 +70,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   loadPreferences: async () => {
     set({isLoading: true});
     try {
-      const stored = await StorageService.loadPreferences();
+      const stored = await getCore().storageService.loadPreferences();
       if (stored) {
         set({preferences: stored});
       }

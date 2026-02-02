@@ -38,11 +38,16 @@ jest.mock('../services/FileSystemService/index', () => ({
   },
 }));
 
-jest.mock('../services/BookParser/MetadataExtractor', () => ({
-  MetadataExtractor: {
-    extract: jest.fn(),
-  },
-}));
+// MetadataExtractor comes from xenolexia-typescript via BookParser re-exports; override only that
+jest.mock('xenolexia-typescript', () => {
+  const actual = jest.requireActual('xenolexia-typescript');
+  return {
+    ...actual,
+    MetadataExtractor: {
+      extract: jest.fn().mockResolvedValue({title: 'Mock Title', authors: [], language: 'en'}),
+    },
+  };
+});
 
 import {v4 as uuidv4} from 'uuid';
 
