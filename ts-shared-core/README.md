@@ -14,7 +14,7 @@ Shared core logic for Xenolexia (React Native and Electron). This package contai
 2. **Provide adapters** that implement the core interfaces:
 
    - `IFileSystem` – read/write files (e.g. Electron IPC, React Native `react-native-fs`)
-   - `IDataStore` – books, vocabulary, sessions, word list (e.g. LowDB, better-sqlite3, react-native-sqlite-storage)
+   - `IDataStore` – books, vocabulary, sessions, word list. **Recommended:** a NoSQL store such as **LowDB** (JSON file). **Optional:** SQLite (e.g. better-sqlite3, react-native-sqlite-storage) when no NoSQL DB is available.
    - `IKeyValueStore` – simple key-value (e.g. electron-store, AsyncStorage)
 
 3. **Create services** using the factory or by instantiating with injected dependencies:

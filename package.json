@@ -19,5 +19,11 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "overrides": {
+    "readable-stream": "$readable-stream"
+  },
+  "devDependencies": {
+    "readable-stream": "^3.6.0"
   }
 }
