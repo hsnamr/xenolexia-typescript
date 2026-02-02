@@ -21,9 +21,8 @@
     "node": ">=18"
   },
   "overrides": {
-    "readable-stream": "$readable-stream"
-  },
-  "devDependencies": {
-    "readable-stream": "^3.6.0"
+    "jszip": {
+      "readable-stream": "~2.3.6"
+    }
   }
 }

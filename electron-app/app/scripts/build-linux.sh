@@ -4,6 +4,17 @@
 
 set -e
 
+# Ensure jszip has nested readable-stream 2.x (with deps) so electron-builder's dependency check passes
+# (root may have readable-stream 3.x for stream-browserify; jszip requires ~2.3.6)
+# Script runs from electron-app/app; monorepo root is ../..
+ROOT_NM="../../node_modules"
+JSZIP_RS="$ROOT_NM/jszip/node_modules/readable-stream"
+if [ -d "$ROOT_NM/jszip" ] && [ ! -d "$JSZIP_RS" ]; then
+  echo "Adding readable-stream@2.x under jszip for electron-builder..."
+  mkdir -p "$ROOT_NM/jszip/node_modules"
+  (cd ../.. && npm install readable-stream@2.3.8 --prefix node_modules/jszip --no-save --legacy-peer-deps 2>/dev/null)
+fi
+
 # Always build these
 TARGETS="AppImage tar.gz"
 
