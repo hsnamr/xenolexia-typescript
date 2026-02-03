@@ -9,6 +9,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -17,6 +18,7 @@ import type { RootStackScreenProps } from '@types/navigation';
 import type { ForeignWordData } from '@types/index';
 import { useLibraryStore } from '@stores/libraryStore';
 import { useVocabularyStore } from '@stores/vocabularyStore';
+import { useStatisticsStore } from '@stores/statisticsStore';
 import {
   useReaderStore,
   selectHasNextChapter,
@@ -62,6 +64,9 @@ export function ReaderScreen(): React.JSX.Element {
 
   const hasNext = useReaderStore(selectHasNextChapter);
   const hasPrevious = useReaderStore(selectHasPreviousChapter);
+
+  const { startSession } = useStatisticsStore();
+  const sessionStartedRef = useRef(false);
 
   const book = getBook(bookId);
 
@@ -119,16 +124,39 @@ export function ReaderScreen(): React.JSX.Element {
     }
   }, [book, currentBook, loadBook]);
 
-  // Cleanup on unmount only
+  // Start reading session when book is loaded (once per open)
+  useEffect(() => {
+    if (bookId && currentBook?.id === bookId && !sessionStartedRef.current) {
+      sessionStartedRef.current = true;
+      startSession(bookId);
+    }
+  }, [bookId, currentBook?.id, startSession]);
+
+  // Cleanup on unmount: save progress, end session, show session summary
   useEffect(() => {
     return () => {
-      // Save progress before closing
       const bookToSave = currentBookRef.current;
       const progress = overallProgressRef.current;
       if (bookToSave) {
         updateBookProgressRef.current(bookToSave.id, progress, null);
       }
+
+      // End session and show summary before closing
+      const stats = useStatisticsStore.getState();
+      const session = stats.currentSession;
+      const wordsRevealed = session?.wordsRevealed ?? 0;
+      const wordsSaved = session?.wordsSaved ?? 0;
+      stats.endSession();
+
       closeBookRef.current();
+
+      if (wordsRevealed > 0 || wordsSaved > 0) {
+        Alert.alert(
+          'Session summary',
+          `Words revealed: ${wordsRevealed}\nWords saved: ${wordsSaved}`,
+          [{ text: 'OK' }],
+        );
+      }
     };
   }, []); // Empty deps - only runs on unmount
 

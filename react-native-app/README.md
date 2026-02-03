@@ -253,10 +253,12 @@ xenolexia-react/
 
 ### Phase 7: Release (v1.0) 🔶 In Progress
 - [x] App store metadata
-- [x] CI/CD pipelines (GitHub Actions)
+- [x] CI/CD pipelines (Fastlane; GitHub Actions optional — see REQUIRES_MANUAL_INPUT.md)
 - [x] Privacy policy and terms
-- [ ] App icons and screenshots
-- [ ] Beta testing
+- [x] Session summary on close (reader)
+- [ ] App icons (all sizes) — see repo root **REQUIRES_MANUAL_INPUT.md**
+- [ ] Screenshots for store listings — see **REQUIRES_MANUAL_INPUT.md**
+- [ ] Beta testing (TestFlight / Play internal) — see **docs/BETA_TESTING.md**
 
 ---
 

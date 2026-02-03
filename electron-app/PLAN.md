@@ -103,7 +103,17 @@ This document outlines the implementation plan for **Xenolexia**, a **desktop-on
 
 ## 🔄 Implementation Status
 
-The application is **Electron-only**. Shared code uses Electron-compatible adapters (FileSystem.electron, AsyncStorage.electron, DatabaseService.electron, Platform via process.platform). Root and docs may still reference React Native in historical or cleanup context.
+**Electron v1 complete.** The application is **Electron-only** (no iOS, Android, or web targets). Shared code uses Electron-compatible adapters (FileSystem, LowDB/electron-store, Platform via process.platform). All core phases are implemented:
+
+- **Library**: Import, discover, grid/list, book detail.
+- **Reader**: Chapter load, word replacement (TranslationEngine), translation popup, save to vocabulary, progress/session persistence, reader settings (theme, font, spacing).
+- **Vocabulary**: List, search, filter, word detail modal, edit/delete, export (CSV, Anki, JSON).
+- **Review**: Flashcard UI, SM-2 grading (Again/Hard/Good/Easy/Already Knew), due-for-review.
+- **Settings / Onboarding**: Language pair, proficiency, density, daily goal; first-run onboarding; persistence (electron-store).
+- **Statistics**: Session/reading stats, “reading over time” chart.
+- **Polish**: Book detail, keyboard shortcuts, window state persistence, system tray (Show/Hide, Quit), E2E tests (Playwright).
+
+**Smoke testing:** Use `docs/SMOKE_TEST_CHECKLIST.md` when testing on Windows, macOS, or Linux. Optional manual items (app icons per platform, code signing) are in repo root `REQUIRES_MANUAL_INPUT.md`.
 
 ### Phase 1: Dependency Replacement
 

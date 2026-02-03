@@ -42,7 +42,7 @@ _Hover "casa" → reveals "house"_
 - **Save words** from the reader with context
 - **Spaced repetition** (SM-2) for saved words
 - **Vocabulary screen**: Search, filter, edit, delete
-- **Review**: Flashcard-style review (planned)
+- **Review**: Flashcard-style review (Again/Hard/Good/Easy/Already Knew)
 
 ### Library
 
@@ -95,9 +95,8 @@ _Hover "casa" → reveals "house"_
 ### Install and run
 
 ```bash
-# Clone
-git clone https://github.com/yourusername/xenolexia-electron.git
-cd xenolexia-electron
+# From monorepo root (xenolexia-typescript)
+cd electron-app
 
 # Install dependencies
 npm install
@@ -116,10 +115,9 @@ npm run electron:build
 # Build for current OS
 npm run electron:build
 
-# Or from desktop package
-cd packages/desktop
+# From electron-app directory
 npm run electron:build:win   # Windows
-npm run electron:build:mac  # macOS
+npm run electron:build:mac   # macOS
 npm run electron:build:linux # Linux
 ```
 
@@ -141,22 +139,17 @@ npm run test:e2e
 ## 📁 Project Structure
 
 ```
-xenolexia-electron/
-├── packages/
-│   ├── desktop/           # Electron app
-│   │   ├── electron/      # main.js, preload.js
-│   │   ├── src/           # React app, screens, components
-│   │   └── package.json
-│   └── shared/            # Shared logic
-│       ├── src/
-│       │   ├── services/  # BookParser, TranslationEngine, StorageService
-│       │   ├── stores/    # library, reader, vocabulary, statistics
-│       │   ├── types/
-│       │   └── utils/
-│       └── package.json
-├── package.json           # Workspace root
-├── PLAN.md                # Implementation plan
-├── REMAINING_TASKS.md      # Remaining work
+electron-app/
+├── app/                   # Electron renderer app
+│   ├── electron/          # main.js, preload.js
+│   ├── src/               # React app, screens, components
+│   └── assets/            # App icon (icon.png)
+├── lib/                   # Shared lib (builds from ts-shared-core)
+├── e2e/                   # Playwright E2E tests
+├── docs/                  # Docs, SMOKE_TEST_CHECKLIST.md
+├── package.json
+├── PLAN.md
+├── REMAINING_TASKS.md
 └── README.md
 ```
 
@@ -164,9 +157,13 @@ xenolexia-electron/
 
 ## 🗺️ Roadmap
 
-- **MVP**: Import books, read with word replacement, hover-to-reveal, save to vocabulary, library and settings. ✅ Done
-- **Done**: Review screen (flashcards), onboarding, export, reader settings, book detail, keyboard shortcuts, window state persistence, Statistics chart.
-- **Later**: More discovery sources, optional system tray / auto-updates.
+- **Electron v1**: Feature-complete for desktop. ✅
+  - MVP: Import books, read with word replacement, hover-to-reveal, save to vocabulary, library and settings.
+  - Review screen (flashcards), onboarding, export, reader settings, book detail, keyboard shortcuts, window state persistence, Statistics (“reading over time”) chart, system tray (Show/Hide, Quit), E2E tests.
+- **Optional polish**: App icons per platform (.icns, .ico), code signing, auto-updater. See `REQUIRES_MANUAL_INPUT.md` (repo root) for manual steps.
+- **Later**: More discovery sources.
+
+**Smoke testing:** Use `docs/SMOKE_TEST_CHECKLIST.md` when testing on Windows, macOS, or Linux.
 
 ---
 

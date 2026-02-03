@@ -34,6 +34,7 @@ export const DatabaseSchema = {
       target_lang TEXT NOT NULL,
       context_sentence TEXT,
       book_id TEXT,
+      book_title TEXT,
       added_at INTEGER NOT NULL,
       last_reviewed_at INTEGER,
       review_count INTEGER DEFAULT 0,
@@ -120,8 +121,8 @@ export const DatabaseSchema = {
    */
   vocabulary: {
     insert: `
-      INSERT INTO vocabulary (id, source_word, target_word, source_lang, target_lang, context_sentence, book_id, added_at, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'new')
+      INSERT INTO vocabulary (id, source_word, target_word, source_lang, target_lang, context_sentence, book_id, book_title, added_at, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'new')
     `,
     update: `
       UPDATE vocabulary SET
@@ -129,7 +130,8 @@ export const DatabaseSchema = {
         review_count = COALESCE(?, review_count),
         ease_factor = COALESCE(?, ease_factor),
         interval = COALESCE(?, interval),
-        status = COALESCE(?, status)
+        status = COALESCE(?, status),
+        book_title = COALESCE(?, book_title)
       WHERE id = ?
     `,
     delete: 'DELETE FROM vocabulary WHERE id = ?',

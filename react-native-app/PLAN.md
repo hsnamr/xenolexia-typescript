@@ -246,7 +246,7 @@ const processed = await translationEngine.processContent(chapterHtml);
 - [x] Track time spent reading (via ReadingSession)
 - [x] Count chapters read
 - [x] Track words revealed vs. saved (statisticsStore)
-- [ ] Session summary on close
+- [x] Session summary on close (Alert with words revealed/saved when leaving reader; startSession/endSession wired in ReaderScreen)
 
 ---
 
@@ -394,8 +394,8 @@ const processed = await translationEngine.processContent(chapterHtml);
 - [x] Updated README
 
 #### 8.4 Launch
-- [ ] Beta testing with real users
-- [ ] Gather feedback and iterate
+- [ ] Beta testing: TestFlight (iOS) and Play Internal Testing (Android) — see **docs/BETA_TESTING.md**
+- [ ] App icons and screenshots — see repo root **REQUIRES_MANUAL_INPUT.md**
 - [ ] App Store submission
 - [ ] Play Store submission
 - [ ] Launch marketing
