@@ -2,13 +2,13 @@
  * Thumbnail Generator
  *
  * Generates thumbnails for book covers and other images.
- * Uses react-native-image-resizer for image manipulation.
- *
- * Note: In a production app, you'd use a library like react-native-image-resizer.
- * This implementation provides a stubbed version that works with the cache system.
+ * Uses @bam.tech/react-native-image-resizer (FOSS, MIT) for resizing and
+ * React Native Image.getSize for dimensions.
  */
 
+import { Image } from 'react-native';
 import RNFS from 'react-native-fs';
+import ImageResizer from '@bam.tech/react-native-image-resizer';
 
 import type {
   ImageDimensions,
@@ -151,50 +151,63 @@ export class ThumbnailGenerator {
   }
 
   /**
-   * Resize an image
-   *
-   * Note: In production, use react-native-image-resizer:
-   * import ImageResizer from 'react-native-image-resizer';
-   * const result = await ImageResizer.createResizedImage(
-   *   sourcePath, width, height, format, quality, 0, undefined, false, { mode }
-   * );
-   * return result.uri;
-   *
-   * For now, we copy the image and trust the cache system.
+   * Resize an image using @bam.tech/react-native-image-resizer (FOSS).
    */
   private async resizeImage(
     sourcePath: string,
     options: ResizeOptions,
   ): Promise<string> {
-    const {format = 'jpeg'} = options;
+    const {
+      width = 0,
+      height = 0,
+      format = 'jpeg',
+      quality = 80,
+      mode = 'cover',
+    } = options;
+
     const extension = format === 'png' ? '.png' : '.jpg';
-    const tempPath = `${this.thumbnailsDir}/temp_${Date.now()}${extension}`;
+    const outputPath = `${this.thumbnailsDir}/temp_${Date.now()}${extension}`;
 
-    // In a real implementation, we'd resize here using react-native-image-resizer
-    // For now, just copy the original
-    // TODO: Add actual image resizing with react-native-image-resizer
+    const w = Math.max(1, width || 1);
+    const h = Math.max(1, height || 1);
+    const compressFormat = format === 'png' ? 'PNG' : 'JPEG';
 
-    await RNFS.copyFile(sourcePath, tempPath);
+    const result = await ImageResizer.createResizedImage(
+      sourcePath,
+      w,
+      h,
+      compressFormat,
+      quality,
+      0,
+      outputPath,
+      false,
+      { mode },
+    );
 
-    return tempPath;
+    return result.path ?? result.uri ?? outputPath;
   }
 
   /**
-   * Get dimensions of an image
-   *
-   * Note: In production, use react-native-image-size or similar
+   * Get dimensions of an image using React Native Image.getSize (no extra deps).
    */
   async getImageDimensions(imagePath: string): Promise<ImageDimensions | null> {
     try {
-      // Check if file exists
       const exists = await RNFS.exists(imagePath);
       if (!exists) {
         return null;
       }
 
-      // TODO: Use react-native-image-size to get actual dimensions
-      // For now, return default dimensions
-      return {width: 300, height: 450};
+      const uri = imagePath.startsWith('file://') ? imagePath : `file://${imagePath}`;
+      return new Promise<ImageDimensions | null>((resolve) => {
+        Image.getSize(
+          uri,
+          (width, height) => resolve({ width, height }),
+          () => {
+            console.warn('Failed to get image dimensions for:', imagePath);
+            resolve(null);
+          },
+        );
+      });
     } catch (error) {
       console.warn('Failed to get image dimensions:', error);
       return null;

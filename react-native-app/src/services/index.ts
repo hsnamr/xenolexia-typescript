@@ -94,5 +94,7 @@ export type {
   ThemeColors,
 } from './ReaderStyleService';
 
+export { BrightnessService } from './BrightnessService';
+
 export { exportService } from './ExportService';
 export type { ExportFormat, ExportOptions, ExportResult } from './ExportService';

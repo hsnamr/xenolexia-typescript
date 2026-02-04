@@ -22,6 +22,7 @@ import {
   READER_THEMES,
   ReaderStyleService,
 } from '@services/ReaderStyleService';
+import { BrightnessService } from '@services/BrightnessService';
 import type { ReaderTheme } from '@/types';
 
 // ============================================================================
@@ -86,7 +87,7 @@ export function ReaderSettingsModal({
     onClose();
   }, [settings, currentBook, onClose]);
 
-  // Reset to defaults
+  // Reset to defaults (reader store settings include wordDensity etc.)
   const handleResetDefaults = useCallback(async () => {
     updateSettings({
       theme: 'light',
@@ -95,8 +96,10 @@ export function ReaderSettingsModal({
       lineHeight: 1.6,
       marginHorizontal: 24,
       textAlign: 'left',
+      brightness: 1.0,
       wordDensity: 0.3,
-    });
+    } as Parameters<typeof updateSettings>[0]);
+    BrightnessService.setBrightness(1.0);
   }, [updateSettings]);
 
   // Get theme colors for the modal based on current reader theme
@@ -314,6 +317,33 @@ function AppearanceSettings({
           step={4}
         />
       </View>
+
+      {/* Brightness (native only; no-op on web) */}
+      {BrightnessService.isSupported() ? (
+        <View style={styles.section}>
+          <View style={styles.sliderHeader}>
+            <Text style={styles.sectionTitle}>Brightness</Text>
+            <Text style={styles.sliderValue}>
+              {Math.round((settings.brightness ?? 1) * 100)}%
+            </Text>
+          </View>
+          <SettingsSlider
+            value={settings.brightness ?? 1}
+            onValueChange={(value) => {
+              const v = Math.round(value * 100) / 100;
+              updateSettings({ brightness: v });
+              BrightnessService.setBrightness(v);
+            }}
+            minimumValue={0.1}
+            maximumValue={1}
+            step={0.05}
+          />
+          <View style={styles.sliderLabels}>
+            <Text style={styles.sliderLabelSmall}>Dim</Text>
+            <Text style={styles.sliderLabelLarge}>Bright</Text>
+          </View>
+        </View>
+      ) : null}
 
       {/* Text Alignment */}
       <View style={styles.section}>

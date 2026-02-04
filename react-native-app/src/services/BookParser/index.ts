@@ -2,9 +2,12 @@
  * Book Parser Service - Parses various e-book formats
  */
 
-// Main service and parser
+// Main service and parsers
 export {BookParserService} from './BookParserService';
 export {EPUBParser} from './EPUBParser';
+export {FB2Parser} from './FB2Parser';
+export {MOBIParser} from './MOBIParser';
+export {TXTParser} from './TXTParser';
 
 // Chapter content service
 export {ChapterContentService, chapterContentService} from './ChapterContentService';

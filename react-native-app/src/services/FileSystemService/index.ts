@@ -1,9 +1,16 @@
 /**
  * File System Service
- * 
+ *
  * Provides file system access for storing books.
  * On web, uses the File System Access API.
- * On native, uses react-native-fs.
+ * On native (iOS/Android), uses react-native-fs (RNFS).
  */
 
-export { FileSystemService } from './FileSystemService.web';
+import { Platform } from 'react-native';
+
+const FileSystemService =
+  Platform.OS === 'web'
+    ? require('./FileSystemService.web').FileSystemService
+    : require('./FileSystemService.native').FileSystemService;
+
+export { FileSystemService };

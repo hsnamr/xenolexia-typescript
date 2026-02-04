@@ -1,35 +1,39 @@
 /**
- * Storage Service - Handles all database operations
+ * Storage Service - Unified facade for all database operations
+ *
+ * Uses FOSS stack:
+ * - react-native-sqlite-storage (DatabaseService) for SQLite
+ * - Delegates to BookRepository, VocabularyRepository, SessionRepository
+ * - Preferences stored in SQLite preferences table (key/value JSON)
  */
 
-import type {Book, VocabularyItem, ReadingSession, ReadingStats, UserPreferences} from '@types/index';
-import {DatabaseSchema} from './DatabaseSchema';
+import type {
+  Book,
+  VocabularyItem,
+  ReadingSession,
+  ReadingStats,
+  UserPreferences,
+} from '@types/index';
 
-// TODO: Import SQLite when implementing
-// import SQLite from 'react-native-sqlite-storage';
+import {databaseService} from './DatabaseService';
+import {bookRepository} from './repositories/BookRepository';
+import {vocabularyRepository} from './repositories/VocabularyRepository';
+import {sessionRepository} from './repositories/SessionRepository';
+
+const PREFERENCES_KEY = 'user_preferences';
 
 export class StorageService {
-  private static db: any = null;
   private static isInitialized = false;
 
   /**
-   * Initialize the database
+   * Initialize the database (via DatabaseService - react-native-sqlite-storage)
    */
   static async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
     try {
-      // TODO: Open SQLite database
-      // this.db = await SQLite.openDatabase({
-      //   name: 'xenolexia.db',
-      //   location: 'default',
-      // });
-
-      // Create tables
-      // await this.db.executeSql(DatabaseSchema.createTables);
-
+      await databaseService.initialize();
       this.isInitialized = true;
-      console.log('Database initialized successfully');
     } catch (error) {
       console.error('Failed to initialize database:', error);
       throw error;
@@ -37,81 +41,73 @@ export class StorageService {
   }
 
   // ============================================================================
-  // Book Operations
+  // Book Operations (delegate to BookRepository)
   // ============================================================================
 
   static async addBook(book: Book): Promise<void> {
     await this.initialize();
-    // TODO: Implement
-    console.log('Adding book:', book.title);
+    await bookRepository.add(book);
   }
 
   static async updateBook(bookId: string, updates: Partial<Book>): Promise<void> {
     await this.initialize();
-    // TODO: Implement
-    console.log('Updating book:', bookId);
+    await bookRepository.update(bookId, updates);
   }
 
   static async deleteBook(bookId: string): Promise<void> {
     await this.initialize();
-    // TODO: Implement
-    console.log('Deleting book:', bookId);
+    await bookRepository.delete(bookId);
   }
 
   static async getBook(bookId: string): Promise<Book | null> {
     await this.initialize();
-    // TODO: Implement
-    return null;
+    return bookRepository.getById(bookId);
   }
 
   static async getAllBooks(): Promise<Book[]> {
     await this.initialize();
-    // TODO: Implement
-    return [];
+    return bookRepository.getAll();
   }
 
   // ============================================================================
-  // Vocabulary Operations
+  // Vocabulary Operations (delegate to VocabularyRepository)
   // ============================================================================
 
   static async addVocabulary(item: VocabularyItem): Promise<void> {
     await this.initialize();
-    // TODO: Implement
-    console.log('Adding vocabulary:', item.sourceWord);
+    await vocabularyRepository.add(item);
   }
 
-  static async updateVocabulary(itemId: string, updates: Partial<VocabularyItem>): Promise<void> {
+  static async updateVocabulary(
+    itemId: string,
+    updates: Partial<VocabularyItem>,
+  ): Promise<void> {
     await this.initialize();
-    // TODO: Implement
-    console.log('Updating vocabulary:', itemId);
+    await vocabularyRepository.update(itemId, updates);
   }
 
   static async deleteVocabulary(itemId: string): Promise<void> {
     await this.initialize();
-    // TODO: Implement
-    console.log('Deleting vocabulary:', itemId);
+    await vocabularyRepository.delete(itemId);
   }
 
   static async getAllVocabulary(): Promise<VocabularyItem[]> {
     await this.initialize();
-    // TODO: Implement
-    return [];
+    return vocabularyRepository.getAll();
   }
 
   static async getVocabularyDueForReview(): Promise<VocabularyItem[]> {
     await this.initialize();
-    // TODO: Implement
-    return [];
+    return vocabularyRepository.getDueForReview();
   }
 
   // ============================================================================
-  // Session Operations
+  // Session Operations (delegate to SessionRepository)
   // ============================================================================
 
   static async startSession(bookId: string): Promise<string> {
     await this.initialize();
-    // TODO: Implement
-    return Date.now().toString();
+    return sessionRepository.startSession(bookId);
   }
 
   static async endSession(
@@ -119,39 +115,44 @@ export class StorageService {
     stats: {pagesRead: number; wordsRevealed: number; wordsSaved: number},
   ): Promise<void> {
     await this.initialize();
-    // TODO: Implement
-    console.log('Ending session:', sessionId);
+    await sessionRepository.endSession(sessionId, {
+      pagesRead: stats.pagesRead,
+      wordsRevealed: stats.wordsRevealed,
+      wordsSaved: stats.wordsSaved,
+    });
   }
 
   static async getReadingStats(): Promise<ReadingStats> {
     await this.initialize();
-    // TODO: Implement
-    return {
-      totalBooksRead: 0,
-      totalReadingTime: 0,
-      totalWordsLearned: 0,
-      currentStreak: 0,
-      longestStreak: 0,
-      averageSessionDuration: 0,
-      wordsRevealedToday: 0,
-      wordsSavedToday: 0,
-    };
+    return sessionRepository.getStatistics();
   }
 
   // ============================================================================
-  // Preferences Operations
+  // Preferences Operations (SQLite preferences table)
   // ============================================================================
 
   static async savePreferences(preferences: UserPreferences): Promise<void> {
     await this.initialize();
-    // TODO: Implement using AsyncStorage or SQLite
-    console.log('Saving preferences');
+    const value = JSON.stringify(preferences);
+    const now = Date.now();
+    await databaseService.execute(
+      `INSERT OR REPLACE INTO preferences (key, value, updated_at) VALUES (?, ?, ?)`,
+      [PREFERENCES_KEY, value, now],
+    );
   }
 
   static async loadPreferences(): Promise<UserPreferences | null> {
     await this.initialize();
-    // TODO: Implement
-    return null;
+    const row = await databaseService.getOne<{value: string}>(
+      'SELECT value FROM preferences WHERE key = ?',
+      [PREFERENCES_KEY],
+    );
+    if (!row?.value) return null;
+    try {
+      return JSON.parse(row.value) as UserPreferences;
+    } catch {
+      return null;
+    }
   }
 
   // ============================================================================
@@ -160,19 +161,65 @@ export class StorageService {
 
   static async exportData(): Promise<string> {
     await this.initialize();
-    // TODO: Export all data as JSON
-    return '{}';
+    const [books, vocabulary, preferences] = await Promise.all([
+      bookRepository.getAll(),
+      vocabularyRepository.getAll(),
+      this.loadPreferences(),
+    ]);
+    const sessions = await sessionRepository.getRecent(1000);
+    const payload = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      books,
+      vocabulary,
+      sessions,
+      preferences,
+    };
+    return JSON.stringify(payload, null, 2);
   }
 
   static async importData(jsonData: string): Promise<void> {
     await this.initialize();
-    // TODO: Import data from JSON
-    console.log('Importing data');
+    let data: {
+      books?: Book[];
+      vocabulary?: VocabularyItem[];
+      preferences?: UserPreferences | null;
+    };
+    try {
+      data = JSON.parse(jsonData) as typeof data;
+    } catch {
+      throw new Error('Invalid JSON data');
+    }
+    if (data.books?.length) {
+      for (const book of data.books) {
+        try {
+          await bookRepository.add(book);
+        } catch (e) {
+          console.warn('Skip duplicate or invalid book:', book.id, e);
+        }
+      }
+    }
+    if (data.vocabulary?.length) {
+      for (const item of data.vocabulary) {
+        try {
+          await vocabularyRepository.add(item);
+        } catch (e) {
+          console.warn('Skip duplicate or invalid vocabulary:', item.id, e);
+        }
+      }
+    }
+    if (data.preferences) {
+      await this.savePreferences(data.preferences);
+    }
   }
 
   static async clearAllData(): Promise<void> {
     await this.initialize();
-    // TODO: Clear all tables
-    console.log('Clearing all data');
+    await databaseService.transaction(async () => {
+      await bookRepository.deleteAll();
+      await vocabularyRepository.deleteAll();
+      await databaseService.execute('DELETE FROM reading_sessions');
+      await databaseService.execute('DELETE FROM preferences');
+    });
   }
 }

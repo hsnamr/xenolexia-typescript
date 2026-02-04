@@ -11,11 +11,14 @@ import type {
   ProcessedChapter,
   TableOfContentsItem,
 } from '@types/index';
-import { EPUBParser } from '@services/BookParser/EPUBParser';
+import { BookParserService } from '@services/BookParser/BookParserService';
+import type { IBookParser } from '@services/BookParser/types';
 import {
   ChapterContentService,
   chapterContentService,
 } from '@services/BookParser/ChapterContentService';
+import { ReaderStyleService } from '@services/ReaderStyleService';
+import { BrightnessService } from '@services/BrightnessService';
 
 // ============================================================================
 // Types
@@ -51,7 +54,7 @@ interface ReaderState {
   error: string | null;
 
   // Internal references
-  parser: EPUBParser | null;
+  parser: IBookParser | null;
   contentService: ChapterContentService;
 
   // Actions
@@ -107,36 +110,40 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
   contentService: chapterContentService,
 
   /**
-   * Load a book and parse its content
+   * Load a book and parse its content (EPUB, FB2, MOBI, TXT via BookParserService)
    */
   loadBook: async (book: Book) => {
     set({ isLoading: true, error: null, currentBook: book });
 
     try {
-      // Create parser instance
-      const parser = new EPUBParser();
+      const parser = BookParserService.getParser(book.filePath, book.format);
 
-      // Parse the EPUB
       const parsedBook = await parser.parse(book.filePath);
 
-      // Load the EPUB in content service for image extraction
-      await get().contentService.loadEpub(book.filePath);
+      // Load EPUB in content service only for EPUB (image extraction from ZIP)
+      if (book.format === 'epub') {
+        await get().contentService.loadEpub(book.filePath);
+      }
 
-      // Update state with parsed data
+      const merged = await ReaderStyleService.getMergedSettings(book.id, defaultSettings);
+      const settingsWithBook = {
+        ...defaultSettings,
+        ...merged,
+        targetLanguage: book.languagePair.targetLanguage,
+        proficiencyLevel: book.proficiencyLevel,
+        wordDensity: book.wordDensity,
+      };
+
       set({
         parser,
         chapters: parsedBook.chapters,
         tableOfContents: parsedBook.tableOfContents,
         isLoading: false,
-        settings: {
-          ...get().settings,
-          targetLanguage: book.languagePair.targetLanguage,
-          proficiencyLevel: book.proficiencyLevel,
-          wordDensity: book.wordDensity,
-        },
+        settings: settingsWithBook,
       });
 
-      // Load the first chapter or resume from saved position
+      BrightnessService.setBrightness(settingsWithBook.brightness ?? 1);
+
       const startChapter = book.currentChapter || 0;
       await get().goToChapter(startChapter);
     } catch (error) {
@@ -252,10 +259,12 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
    * Close the current book and clean up
    */
   closeBook: () => {
-    const { parser, contentService } = get();
+    const { parser, contentService, currentBook } = get();
 
-    // Clean up resources
     parser?.dispose();
+    if (currentBook?.filePath) {
+      BookParserService.dispose(currentBook.filePath);
+    }
     contentService.dispose();
 
     set({

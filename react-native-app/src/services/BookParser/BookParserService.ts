@@ -1,10 +1,19 @@
 /**
  * Book Parser Service - Factory for creating appropriate parsers
+ *
+ * Uses FOSS libraries:
+ * - EPUB: EPUBExtractor + JSZip (existing)
+ * - FB2: fast-xml-parser
+ * - MOBI/KF8: @lingo-reader/mobi-parser
+ * - TXT: RNFS (plain text, single chapter)
  */
 
 import type {BookFormat, ParsedBook} from '@types/index';
 import type {IBookParser, ParserOptions} from './types';
 import {EPUBParser} from './EPUBParser';
+import {FB2Parser} from './FB2Parser';
+import {MOBIParser} from './MOBIParser';
+import {TXTParser} from './TXTParser';
 
 export class BookParserService {
   private static parsers: Map<string, IBookParser> = new Map();
@@ -29,27 +38,25 @@ export class BookParserService {
     format: BookFormat,
     options?: ParserOptions,
   ): IBookParser {
-    // Check if we already have a parser for this file
     const existingParser = this.parsers.get(filePath);
     if (existingParser) {
       return existingParser;
     }
 
-    // Create appropriate parser based on format
     let parser: IBookParser;
     switch (format) {
       case 'epub':
         parser = new EPUBParser(options);
         break;
       case 'fb2':
-        // TODO: Implement FB2 parser
-        throw new Error('FB2 format not yet supported');
+        parser = new FB2Parser(options);
+        break;
       case 'mobi':
-        // TODO: Implement MOBI parser
-        throw new Error('MOBI format not yet supported');
+        parser = new MOBIParser(options);
+        break;
       case 'txt':
-        // TODO: Implement TXT parser
-        throw new Error('TXT format not yet supported');
+        parser = new TXTParser(options);
+        break;
       default:
         throw new Error(`Unsupported format: ${format}`);
     }

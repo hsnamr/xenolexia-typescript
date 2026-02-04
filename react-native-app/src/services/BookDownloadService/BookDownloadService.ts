@@ -944,22 +944,41 @@ export class BookDownloadService {
   }
 
   /**
-   * Get list of locally stored ebooks
+   * Get list of locally stored ebooks (from BOOKS_DIRECTORY and its book-id subdirs).
+   * Uses RNFS.readDir; download layout is BOOKS_DIRECTORY/bookId/filename.
    */
   static async getLocalBooks(): Promise<LocalEbookFile[]> {
     await this.initialize();
 
     try {
-      const files = await RNFS.readDir(BOOKS_DIRECTORY);
-      return files
-        .filter(file => file.isFile() && this.isSupportedFormat(file.name))
-        .map(file => ({
-          path: file.path,
-          name: file.name,
-          size: file.size,
-          format: this.detectFormat(file.name)!,
-          lastModified: file.mtime,
-        }));
+      const entries = await RNFS.readDir(BOOKS_DIRECTORY);
+      const results: LocalEbookFile[] = [];
+
+      for (const entry of entries) {
+        if (entry.isFile() && this.isSupportedFormat(entry.name)) {
+          results.push({
+            path: entry.path,
+            name: entry.name,
+            size: entry.size,
+            format: this.detectFormat(entry.name)!,
+            lastModified: entry.mtime,
+          });
+        } else if (entry.isDirectory()) {
+          const bookFiles = await RNFS.readDir(entry.path);
+          for (const file of bookFiles) {
+            if (file.isFile() && this.isSupportedFormat(file.name)) {
+              results.push({
+                path: file.path,
+                name: file.name,
+                size: file.size,
+                format: this.detectFormat(file.name)!,
+                lastModified: file.mtime,
+              });
+            }
+          }
+        }
+      }
+      return results;
     } catch (error) {
       console.error('Failed to get local books:', error);
       return [];
@@ -967,18 +986,54 @@ export class BookDownloadService {
   }
 
   /**
-   * Delete a locally stored ebook
+   * Delete a locally stored ebook (file or book directory).
+   * Uses react-native-fs (RNFS) FOSS library.
    */
   static async deleteLocalBook(filePath: string): Promise<boolean> {
     try {
-      // TODO: Implement using RNFS
-      // await RNFS.unlink(filePath);
-      console.log('Deleting book:', filePath);
+      const exists = await RNFS.exists(filePath);
+      if (!exists) {
+        return true;
+      }
+
+      const stat = await RNFS.stat(filePath);
+      if (stat.isFile()) {
+        await RNFS.unlink(filePath);
+        // Remove parent book directory if it is now empty
+        const parentDir = filePath.replace(/\/[^/]+$/, '');
+        if (parentDir.startsWith(BOOKS_DIRECTORY) && parentDir !== BOOKS_DIRECTORY) {
+          try {
+            const siblings = await RNFS.readDir(parentDir);
+            if (siblings.length === 0) {
+              await RNFS.unlink(parentDir);
+            }
+          } catch {
+            // Ignore cleanup errors
+          }
+        }
+      } else {
+        await this.deleteDirectoryRecursive(filePath);
+      }
       return true;
     } catch (error) {
       console.error('Failed to delete book:', error);
       return false;
     }
+  }
+
+  /**
+   * Recursively delete a directory and its contents (RNFS).
+   */
+  private static async deleteDirectoryRecursive(dirPath: string): Promise<void> {
+    const items = await RNFS.readDir(dirPath);
+    for (const item of items) {
+      if (item.isDirectory()) {
+        await this.deleteDirectoryRecursive(item.path);
+      } else {
+        await RNFS.unlink(item.path);
+      }
+    }
+    await RNFS.unlink(dirPath);
   }
 
   /**
