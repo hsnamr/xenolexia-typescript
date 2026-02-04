@@ -14,7 +14,7 @@ import {
   type ReaderSettings,
   type TableOfContentsItem,
 } from 'xenolexia-typescript';
-import {getCore} from '../electronCore';
+import { getCore } from '../electronCore';
 
 import {useLibraryStore} from './libraryStore';
 
@@ -138,11 +138,11 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
         console.log('Loading book from:', book.filePath);
       }
 
-      // Detect format and create appropriate parser
+      // Detect format and create appropriate parser (use core instance with Electron IFileSystem)
       const format = BookParserService.detectFormat(book.filePath);
       console.log('Detected book format:', format);
 
-      const parser = BookParserService.getParser(book.filePath, format);
+      const parser = getCore().bookParserService.getParser(book.filePath, format);
       console.log('Parser created, parsing book...');
 
       // Parse the book

@@ -11,12 +11,12 @@ import type {
   ProcessedChapter,
   TableOfContentsItem,
 } from '@types/index';
-import { BookParserService } from '@services/BookParser/BookParserService';
-import type { IBookParser } from '@services/BookParser/types';
 import {
-  ChapterContentService,
+  BookParserService,
+  bookParserService,
   chapterContentService,
-} from '@services/BookParser/ChapterContentService';
+} from '@services/BookParser';
+import type { IBookParser, ChapterContentService } from 'xenolexia-typescript';
 import { ReaderStyleService } from '@services/ReaderStyleService';
 import { BrightnessService } from '@services/BrightnessService';
 
@@ -116,7 +116,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     set({ isLoading: true, error: null, currentBook: book });
 
     try {
-      const parser = BookParserService.getParser(book.filePath, book.format);
+      const parser = bookParserService.getParser(book.filePath, book.format);
 
       const parsedBook = await parser.parse(book.filePath);
 
@@ -263,7 +263,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
 
     parser?.dispose();
     if (currentBook?.filePath) {
-      BookParserService.dispose(currentBook.filePath);
+      bookParserService.dispose(currentBook.filePath);
     }
     contentService.dispose();
 

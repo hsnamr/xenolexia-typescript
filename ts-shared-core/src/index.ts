@@ -119,6 +119,11 @@ export {
 } from './services/BookParser';
 export type { IBookParser, ParserOptions, SearchResult } from './services/BookParser';
 
+/** Create a BookParserService instance with the given IFileSystem (for platforms that only need parsing). */
+export function createBookParserService(fileSystem: IFileSystem): BookParserService {
+  return new BookParserService(fileSystem);
+}
+
 // Hooks (optional peer: react)
 export { useAsync, useDebounce } from './hooks';
 export type { UseAsyncReturn } from './hooks';

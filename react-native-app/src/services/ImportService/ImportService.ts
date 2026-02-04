@@ -11,7 +11,11 @@ import RNFS from 'react-native-fs';
 import {v4 as uuidv4} from 'uuid';
 
 import type {BookFormat} from '@/types';
-import {MetadataExtractor} from '@services/BookParser';
+import {
+  rnfsFileSystem,
+  extractEPUBInfo,
+  extractEPUBCover,
+} from '@services/BookParser';
 import {FileSystemService} from '@services/FileSystemService';
 import type {
   ImportProgress,
@@ -345,29 +349,27 @@ export class ImportService {
   }
 
   /**
-   * Parse EPUB metadata using MetadataExtractor
+   * Parse EPUB metadata using ts-shared-core (MetadataExtractor via rnfsFileSystem)
    */
   private static async parseEPUBMetadata(
     filePath: string,
   ): Promise<Partial<ImportedBookMetadata>> {
-    const extractor = new MetadataExtractor();
-
     try {
-      const extracted = await extractor.extractFromFile(filePath);
-
+      const info = await extractEPUBInfo(rnfsFileSystem, filePath);
+      const m = info.metadata;
       return {
-        title: extracted.metadata.title,
-        author: extracted.metadata.author,
-        description: extracted.metadata.description,
-        publisher: extracted.metadata.publisher,
-        publishDate: extracted.metadata.publishDate,
-        isbn: extracted.metadata.isbn,
-        language: extracted.language,
-        totalChapters: extracted.chapterCount,
-        subjects: extracted.metadata.subjects,
+        title: m.title,
+        author: m.author,
+        description: m.description,
+        publisher: m.publisher,
+        publishDate: m.publishDate,
+        isbn: m.isbn,
+        language: info.language,
+        totalChapters: info.chapterCount,
+        subjects: m.subjects,
       };
-    } finally {
-      extractor.dispose();
+    } catch {
+      return {};
     }
   }
 
@@ -395,23 +397,18 @@ export class ImportService {
   }
 
   /**
-   * Extract cover image from EPUB
+   * Extract cover image from EPUB (ts-shared-core via rnfsFileSystem)
    */
   private static async extractCoverImage(
     bookId: string,
     filePath: string,
   ): Promise<string | null> {
-    const extractor = new MetadataExtractor();
-
     try {
-      await extractor.extractFromFile(filePath);
       const bookDir = `${BOOKS_BASE_DIR}/${bookId}`;
-      return await extractor.extractCover(bookDir);
+      return await extractEPUBCover(rnfsFileSystem, filePath, bookDir);
     } catch (error) {
       console.warn('Failed to extract cover image:', error);
       return null;
-    } finally {
-      extractor.dispose();
     }
   }
 

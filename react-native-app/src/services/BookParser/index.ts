@@ -1,49 +1,28 @@
 /**
- * Book Parser Service - Parses various e-book formats
+ * Book Parser - Re-export from xenolexia-typescript core + RN instances (RNFS adapter).
  */
 
-// Main service and parsers (FB2Parser from shared core)
-export {BookParserService} from './BookParserService';
-export {EPUBParser} from './EPUBParser';
-export {FB2Parser} from 'xenolexia-typescript';
-export {MOBIParser} from './MOBIParser';
-export {TXTParser} from './TXTParser';
-
-// Chapter content service
-export {ChapterContentService, chapterContentService} from './ChapterContentService';
-export type {ChapterStyles, ProcessedChapterContent} from './ChapterContentService';
-
-// Text processing service (tokenization, word replacement)
-export {TextProcessingService, textProcessingService} from './TextProcessingService';
-export type {
-  ProcessingOptions,
-  ProcessedContent,
-  ProcessingStats,
-  ExtractedContent,
-} from './TextProcessingService';
-
-// Low-level utilities
-export {EPUBExtractor} from './EPUBExtractor';
-export type {
-  EPUBContainer,
-  EPUBManifestItem,
-  EPUBSpineItem,
-  EPUBPackage,
-  EPUBRawMetadata,
-} from './EPUBExtractor';
-
-// TOC parsing
-export {parseNCX, parseNAV, flattenTOC, countTOCItems, findTOCItemByHref} from './TOCParser';
-export type {TOCParseResult, PageListItem} from './TOCParser';
-
-// Metadata extraction
 export {
+  BookParserService,
+  EPUBParser,
+  FB2Parser,
+  TXTParser,
+  MOBIParser,
+  ChapterContentService,
+  TextProcessingService,
+  EPUBExtractor,
   MetadataExtractor,
   extractEPUBMetadata,
   extractEPUBInfo,
   extractEPUBCover,
-} from './MetadataExtractor';
-export type {ExtractedMetadata, CoverExtractionResult} from './MetadataExtractor';
+} from 'xenolexia-typescript';
+export type {
+  IBookParser,
+  ParserOptions,
+  SearchResult,
+  ChapterStyles,
+  ProcessedChapterContent,
+} from 'xenolexia-typescript';
 
-// Types
-export type {IBookParser, SearchResult, ParserOptions} from './types';
+export { bookParserService, chapterContentService } from './bookParserCore';
+export { rnfsFileSystem } from './rnfsAdapter';

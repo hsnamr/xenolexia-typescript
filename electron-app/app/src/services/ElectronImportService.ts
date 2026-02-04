@@ -2,6 +2,7 @@
  * Electron Import Service - Wraps ImportService for Electron with file dialog
  */
 
+import { getCore } from '@xenolexia/shared';
 import {
   BookParserService,
   MetadataExtractor,
@@ -87,9 +88,9 @@ export async function importBookFromFile(
           language: extracted.language,
         };
       } else {
-        // For other formats, use BookParserService
-        const format = fileExtension.toLowerCase() === '.mobi' ? 'mobi' : 'txt';
-        const parser = BookParserService.getParser(targetPath, format as any);
+        // For other formats, use core bookParserService (instance with Electron IFileSystem)
+        const format = BookParserService.detectFormat(targetPath);
+        const parser = getCore().bookParserService.getParser(targetPath, format);
         const parsed = await parser.parse(targetPath);
         metadata = {
           title: parsed.metadata.title || file.name.replace(/\.[^.]+$/, ''),
