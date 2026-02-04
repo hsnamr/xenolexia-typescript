@@ -5,6 +5,7 @@
 // Main service and parser
 export {BookParserService} from './BookParserService';
 export {EPUBParser} from './EPUBParser';
+export {FB2Parser} from './FB2Parser';
 export {TXTParser} from './TXTParser';
 export {MOBIParser} from './MOBIParser';
 

@@ -3,17 +3,18 @@
  *
  * Uses FOSS libraries:
  * - EPUB: EPUBExtractor + JSZip (existing)
- * - FB2: fast-xml-parser
+ * - FB2: xenolexia-typescript FB2Parser (fast-xml-parser) via RNFS adapter
  * - MOBI/KF8: @lingo-reader/mobi-parser
  * - TXT: RNFS (plain text, single chapter)
  */
 
-import type {BookFormat, ParsedBook} from '@types/index';
-import type {IBookParser, ParserOptions} from './types';
-import {EPUBParser} from './EPUBParser';
-import {FB2Parser} from './FB2Parser';
-import {MOBIParser} from './MOBIParser';
-import {TXTParser} from './TXTParser';
+import { FB2Parser } from 'xenolexia-typescript';
+import type { BookFormat, ParsedBook } from '@types/index';
+import type { IBookParser, ParserOptions } from './types';
+import { rnfsFileSystem } from './rnfsAdapter';
+import { EPUBParser } from './EPUBParser';
+import { MOBIParser } from './MOBIParser';
+import { TXTParser } from './TXTParser';
 
 export class BookParserService {
   private static parsers: Map<string, IBookParser> = new Map();
@@ -49,7 +50,7 @@ export class BookParserService {
         parser = new EPUBParser(options);
         break;
       case 'fb2':
-        parser = new FB2Parser(options);
+        parser = new FB2Parser(rnfsFileSystem, options);
         break;
       case 'mobi':
         parser = new MOBIParser(options);

@@ -106,6 +106,7 @@ export type { ExportFormat, ExportOptions, ExportResult } from './services/Expor
 export {
   BookParserService,
   EPUBParser,
+  FB2Parser,
   TXTParser,
   MOBIParser,
   ChapterContentService,
@@ -117,6 +118,10 @@ export {
   extractEPUBCover,
 } from './services/BookParser';
 export type { IBookParser, ParserOptions, SearchResult } from './services/BookParser';
+
+// Hooks (optional peer: react)
+export { useAsync, useDebounce } from './hooks';
+export type { UseAsyncReturn } from './hooks';
 
 // Factory: create core services with host adapters
 import type { IFileSystem, IDataStore, IKeyValueStore } from './adapters';

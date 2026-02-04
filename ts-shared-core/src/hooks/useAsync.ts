@@ -1,8 +1,9 @@
 /**
  * useAsync Hook - Handles async operations with loading/error states
+ * Shared between Electron and React Native. Requires React (peer).
  */
 
-import {useState, useCallback} from 'react';
+import { useState, useCallback } from 'react';
 
 interface AsyncState<T> {
   data: T | null;
@@ -10,12 +11,12 @@ interface AsyncState<T> {
   error: Error | null;
 }
 
-interface UseAsyncReturn<T, Args extends any[]> extends AsyncState<T> {
+export interface UseAsyncReturn<T, Args extends unknown[]> extends AsyncState<T> {
   execute: (...args: Args) => Promise<T | null>;
   reset: () => void;
 }
 
-export function useAsync<T, Args extends any[] = []>(
+export function useAsync<T, Args extends unknown[] = []>(
   asyncFunction: (...args: Args) => Promise<T>,
 ): UseAsyncReturn<T, Args> {
   const [state, setState] = useState<AsyncState<T>>({
@@ -26,15 +27,15 @@ export function useAsync<T, Args extends any[] = []>(
 
   const execute = useCallback(
     async (...args: Args): Promise<T | null> => {
-      setState(prev => ({...prev, isLoading: true, error: null}));
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       try {
         const result = await asyncFunction(...args);
-        setState({data: result, isLoading: false, error: null});
+        setState({ data: result, isLoading: false, error: null });
         return result;
       } catch (error) {
         const err = error instanceof Error ? error : new Error(String(error));
-        setState({data: null, isLoading: false, error: err});
+        setState({ data: null, isLoading: false, error: err });
         return null;
       }
     },
@@ -42,7 +43,7 @@ export function useAsync<T, Args extends any[] = []>(
   );
 
   const reset = useCallback(() => {
-    setState({data: null, isLoading: false, error: null});
+    setState({ data: null, isLoading: false, error: null });
   }, []);
 
   return {

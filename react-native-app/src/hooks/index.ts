@@ -1,6 +1,6 @@
 /**
- * Custom React Hooks
+ * Hooks - Re-export from xenolexia-typescript core.
  */
 
-export {useDebounce} from './useDebounce';
-export {useAsync} from './useAsync';
+export { useAsync, useDebounce } from 'xenolexia-typescript';
+export type { UseAsyncReturn } from 'xenolexia-typescript';

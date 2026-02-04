@@ -2,10 +2,10 @@
  * Book Parser Service - Parses various e-book formats
  */
 
-// Main service and parsers
+// Main service and parsers (FB2Parser from shared core)
 export {BookParserService} from './BookParserService';
 export {EPUBParser} from './EPUBParser';
-export {FB2Parser} from './FB2Parser';
+export {FB2Parser} from 'xenolexia-typescript';
 export {MOBIParser} from './MOBIParser';
 export {TXTParser} from './TXTParser';
 

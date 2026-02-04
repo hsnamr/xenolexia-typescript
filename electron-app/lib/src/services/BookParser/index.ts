@@ -5,6 +5,7 @@
 export {
   BookParserService,
   EPUBParser,
+  FB2Parser,
   TXTParser,
   MOBIParser,
   ChapterContentService,

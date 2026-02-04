@@ -98,6 +98,7 @@ const LANGUAGE_CODES: Record<Language, { iso639_1: string; name: string }> = {
   zh: { iso639_1: 'zh', name: 'Chinese' },
   ko: { iso639_1: 'ko', name: 'Korean' },
   ar: { iso639_1: 'ar', name: 'Arabic' },
+  he: { iso639_1: 'he', name: 'Hebrew' },
   nl: { iso639_1: 'nl', name: 'Dutch' },
   pl: { iso639_1: 'pl', name: 'Polish' },
   tr: { iso639_1: 'tr', name: 'Turkish' },

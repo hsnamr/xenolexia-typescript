@@ -65,6 +65,7 @@ const FREQUENCY_LIST_SOURCES: Record<Language, string | null> = {
   zh: null,
   ko: null,
   ar: 'https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/ar/ar_50k.txt',
+  he: null,
   nl: 'https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/nl/nl_50k.txt',
   pl: 'https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/pl/pl_50k.txt',
   tr: 'https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/tr/tr_50k.txt',

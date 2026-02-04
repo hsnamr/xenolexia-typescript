@@ -15,9 +15,16 @@
     "@lingo-reader/mobi-parser": "^0.4.5",
     "date-fns": "^3.6.0",
     "epubjs": "^0.3.93",
+    "fast-xml-parser": "^4.5.0",
     "jszip": "^3.10.1",
     "lodash": "^4.17.21",
     "uuid": "^10.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true }
   },
   "devDependencies": {
     "@types/jest": "^29.5.0",

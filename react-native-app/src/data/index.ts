@@ -1,5 +1,5 @@
 /**
- * Data exports - Bundled word lists and other static data
+ * Data - Re-export from xenolexia-typescript core.
  */
 
 export {
@@ -9,6 +9,5 @@ export {
   ADVANCED_WORDS,
   getWordsByLevel,
   getTotalWordCount,
-} from './words_en_el';
-
-export type { WordData } from './words_en_el';
+} from 'xenolexia-typescript';
+export type { WordData } from 'xenolexia-typescript';
