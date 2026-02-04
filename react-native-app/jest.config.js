@@ -23,6 +23,7 @@ module.exports = {
     '^@constants/(.*)$': '<rootDir>/src/constants/$1',
     '^@assets/(.*)$': '<rootDir>/src/assets/$1',
     '^@navigation/(.*)$': '<rootDir>/src/navigation/$1',
+    '^@theme(.*)$': '<rootDir>/src/theme$1',
   },
   
   // Test patterns
@@ -31,6 +32,8 @@ module.exports = {
     '<rootDir>/node_modules/',
     '<rootDir>/android/',
     '<rootDir>/ios/',
+    '/test-utils\\.(tsx?|jsx?)$',
+    '/testUtils\\.(tsx?|jsx?)$',
   ],
   
   // Setup files
@@ -54,9 +57,9 @@ module.exports = {
     },
   },
   
-  // Mocking
+  // Mocking - transform these node_modules (some ship .js with TS syntax, e.g. react-native-fs)
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-reanimated|react-native-gesture-handler|react-native-screens|react-native-safe-area-context|@react-native-async-storage)/)',
+    'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-reanimated|react-native-gesture-handler|react-native-screens|react-native-safe-area-context|@react-native-async-storage|react-native-fs)/)',
   ],
   
   // Environment

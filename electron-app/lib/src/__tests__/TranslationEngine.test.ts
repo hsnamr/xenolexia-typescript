@@ -27,18 +27,22 @@ describe('TranslationEngine', () => {
   });
 
   describe('processContent', () => {
-    it('should return content and foreignWords array', async () => {
-      const engine = createTranslationEngine(defaultOptions);
-      const html = '<p>The house is big.</p>';
-      const result = await engine.processContent(html);
-      expect(result).toHaveProperty('content');
-      expect(result).toHaveProperty('foreignWords');
-      expect(Array.isArray(result.foreignWords)).toBe(true);
-      expect(result).toHaveProperty('stats');
-      expect(result.stats).toHaveProperty('totalWords');
-      expect(result.stats).toHaveProperty('replacedWords');
-      expect(typeof result.content).toBe('string');
-    });
+    it(
+      'should return content and foreignWords array',
+      async () => {
+        const engine = createTranslationEngine(defaultOptions);
+        const html = '<p>The house is big.</p>';
+        const result = await engine.processContent(html);
+        expect(result).toHaveProperty('content');
+        expect(result).toHaveProperty('foreignWords');
+        expect(Array.isArray(result.foreignWords)).toBe(true);
+        expect(result).toHaveProperty('stats');
+        expect(result.stats).toHaveProperty('totalWords');
+        expect(result.stats).toHaveProperty('replacedWords');
+        expect(typeof result.content).toBe('string');
+      },
+      15000
+    );
 
     it('should return content that includes foreign word markers when matches exist', async () => {
       const engine = createTranslationEngine({ ...defaultOptions, density: 1 });

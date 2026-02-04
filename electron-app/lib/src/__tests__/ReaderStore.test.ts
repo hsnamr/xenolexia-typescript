@@ -1,33 +1,56 @@
 /**
  * Tests for ReaderStore - Opening ebooks and progress tracking.
- * Store uses getCore() and BookParserService from xenolexia-typescript; parser is mocked here.
+ * Store uses getCore().bookParserService.getParser(); we mock getCore() here.
  */
 
 import { useReaderStore } from '../stores/readerStore';
 
 import type { Book } from '../types';
 
-// Injected into BookParserService mock (set per test)
+// Injected into getCore() mock (set per test)
 let mockParserResult: { chapters: Array<{ index: number; title: string; content: string }>; tableOfContents: unknown[] } = {
   chapters: [],
   tableOfContents: [],
 };
 let mockParserParseError: Error | null = null;
 
+function createMockParser() {
+  return {
+    parse: () =>
+      mockParserParseError
+        ? Promise.reject(mockParserParseError)
+        : Promise.resolve(mockParserResult),
+    dispose: () => {},
+  };
+}
+
 jest.mock('xenolexia-typescript', () => {
   const actual = jest.requireActual('xenolexia-typescript');
   return {
     ...actual,
     BookParserService: {
-      detectFormat: () => 'epub',
-      getParser: () => ({
-        parse: () =>
-          mockParserParseError
-            ? Promise.reject(mockParserParseError)
-            : Promise.resolve(mockParserResult),
-        dispose: () => {},
-      }),
+      detectFormat: () => 'epub' as const,
     },
+  };
+});
+
+jest.mock('../electronCore', () => {
+  const actual = jest.requireActual('../electronCore');
+  return {
+    ...actual,
+    getCore: () => ({
+      bookParserService: {
+        getParser: () => createMockParser(),
+      },
+      createChapterContentService: () => ({
+        loadEpub: jest.fn().mockResolvedValue(undefined),
+        getChapterHtml: jest.fn().mockResolvedValue({ html: '<p>Mock chapter</p>', foreignWords: [] }),
+      }),
+      createTranslationEngine: jest.fn(),
+      storageService: {
+        endSession: jest.fn().mockResolvedValue(undefined),
+      },
+    }),
   };
 });
 
