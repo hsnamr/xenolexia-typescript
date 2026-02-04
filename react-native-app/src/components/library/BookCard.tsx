@@ -15,6 +15,7 @@ import {BookCover} from './BookCover';
 interface BookCardProps {
   book: Book;
   onPress: () => void;
+  onLongPress?: (book: Book) => void;
   onDelete?: (bookId: string) => void;
 }
 
@@ -36,7 +37,7 @@ const LANGUAGE_FLAGS: Record<string, string> = {
   en: '🇬🇧',
 };
 
-export function BookCard({book, onPress, onDelete}: BookCardProps): React.JSX.Element {
+export function BookCard({book, onPress, onLongPress, onDelete}: BookCardProps): React.JSX.Element {
   const colors = useColors();
   const [showDeleteButton, setShowDeleteButton] = useState(false);
 
@@ -44,10 +45,12 @@ export function BookCard({book, onPress, onDelete}: BookCardProps): React.JSX.El
   const hasProgress = book.progress > 0;
 
   const handleLongPress = useCallback(() => {
-    if (onDelete) {
+    if (onLongPress) {
+      onLongPress(book);
+    } else if (onDelete) {
       setShowDeleteButton(true);
     }
-  }, [onDelete]);
+  }, [book, onLongPress, onDelete]);
 
   const handleDelete = useCallback(() => {
     if (!onDelete) return;

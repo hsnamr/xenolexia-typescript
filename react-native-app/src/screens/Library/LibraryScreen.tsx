@@ -15,6 +15,7 @@ import type {Book, RootStackParamList} from '@/types';
 
 import {useLibraryStore} from '@stores/libraryStore';
 import {BookCard} from '@components/library/BookCard';
+import {BookContextMenu} from '@components/library/BookContextMenu';
 import {EmptyLibrary} from '@components/library/EmptyLibrary';
 import {ImportBookButton} from '@components/library/ImportBookButton';
 import {ScreenHeader, LoadingBookGrid} from '@components/common';
@@ -29,6 +30,7 @@ export function LibraryScreen(): React.JSX.Element {
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [contextMenuBook, setContextMenuBook] = useState<Book | null>(null);
 
   // Filter books by search query
   const filteredBooks = books.filter(
@@ -82,10 +84,11 @@ export function LibraryScreen(): React.JSX.Element {
       <BookCard
         book={item}
         onPress={() => handleBookPress(item)}
+        onLongPress={handleBookLongPress}
         onDelete={handleDeleteBook}
       />
     ),
-    [handleBookPress, handleDeleteBook]
+    [handleBookPress, handleBookLongPress, handleDeleteBook]
   );
 
   const keyExtractor = useCallback((item: Book) => item.id, []);
@@ -106,6 +109,14 @@ export function LibraryScreen(): React.JSX.Element {
 
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]} edges={['top']}>
+      <BookContextMenu
+        visible={contextMenuBook !== null}
+        book={contextMenuBook}
+        onClose={handleCloseContextMenu}
+        onViewDetails={handleViewDetails}
+        onEdit={handleEditBook}
+        onDelete={handleContextMenuDelete}
+      />
       <ScreenHeader
         title="Library"
         subtitle={books.length > 0 ? `${books.length} books` : undefined}

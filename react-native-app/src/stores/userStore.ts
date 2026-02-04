@@ -1,9 +1,13 @@
 /**
  * User Store - Manages user preferences and settings
+ * Persists preferences to AsyncStorage.
  */
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {create} from 'zustand';
 import type {UserPreferences, ReaderSettings} from '@types/index';
+
+const USER_PREFERENCES_KEY = '@xenolexia/user_preferences';
 
 const defaultReaderSettings: ReaderSettings = {
   theme: 'light',
@@ -69,11 +73,20 @@ export const useUserStore = create<UserState>((set, get) => ({
   loadPreferences: async () => {
     set({isLoading: true});
     try {
-      // TODO: Load from AsyncStorage
-      // const stored = await AsyncStorage.getItem('userPreferences');
-      // if (stored) {
-      //   set({ preferences: JSON.parse(stored) });
-      // }
+      const stored = await AsyncStorage.getItem(USER_PREFERENCES_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as Partial<UserPreferences>;
+        set(state => ({
+          preferences: {
+            ...defaultPreferences,
+            ...parsed,
+            readerSettings: {
+              ...defaultPreferences.readerSettings,
+              ...(parsed.readerSettings ?? {}),
+            },
+          },
+        }));
+      }
       set({isLoading: false});
     } catch (error) {
       console.error('Failed to load preferences:', error);
@@ -83,8 +96,10 @@ export const useUserStore = create<UserState>((set, get) => ({
 
   savePreferences: async () => {
     try {
-      // TODO: Save to AsyncStorage
-      // await AsyncStorage.setItem('userPreferences', JSON.stringify(get().preferences));
+      await AsyncStorage.setItem(
+        USER_PREFERENCES_KEY,
+        JSON.stringify(get().preferences),
+      );
     } catch (error) {
       console.error('Failed to save preferences:', error);
     }

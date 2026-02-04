@@ -4,7 +4,7 @@
  * @format
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {StatusBar} from 'react-native';
 
@@ -14,6 +14,8 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import {ThemeProvider, useIsDark} from '@/theme';
+import {useStatisticsStore} from '@stores/statisticsStore';
+import {useUserStore} from '@stores/userStore';
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -41,8 +43,17 @@ function ThemedStatusBar() {
 
 /**
  * Main App with all providers
+ * Loads persisted user preferences and statistics on mount.
  */
 function AppContent(): React.JSX.Element {
+  const loadPreferences = useUserStore(state => state.loadPreferences);
+  const loadStats = useStatisticsStore(state => state.loadStats);
+
+  useEffect(() => {
+    loadPreferences();
+    loadStats();
+  }, [loadPreferences, loadStats]);
+
   return (
     <>
       <ThemedStatusBar />

@@ -16,12 +16,14 @@ import {TabBarIcon} from '@components/common/TabBarIcon';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer, DefaultTheme, DarkTheme} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {BookDetailScreen} from '@screens/BookDetail/BookDetailScreen';
 import {BookDiscoveryScreen} from '@screens/BookDiscovery/BookDiscoveryScreen';
 import {LibraryScreen} from '@screens/Library/LibraryScreen';
 import {OnboardingScreen} from '@screens/Onboarding/OnboardingScreen';
 import {ProfileScreen} from '@screens/Profile/ProfileScreen';
 import {ReaderScreen} from '@screens/Reader/ReaderScreen';
 import {StatisticsScreen} from '@screens/Statistics/StatisticsScreen';
+import {VocabularyDetailScreen} from '@screens/Vocabulary/VocabularyDetailScreen';
 import {VocabularyScreen} from '@screens/Vocabulary/VocabularyScreen';
 import {ReviewScreen} from '@screens/Vocabulary/ReviewScreen';
 
@@ -258,7 +260,7 @@ export function AppNavigator(): React.JSX.Element {
         {/* Book Detail - Slide from right */}
         <Stack.Screen
           name="BookDetail"
-          component={() => <PlaceholderScreen title="Book Details" />}
+          component={BookDetailScreen}
           options={{
             animation: 'slide_from_right',
           }}
@@ -276,7 +278,7 @@ export function AppNavigator(): React.JSX.Element {
         {/* Vocabulary Detail */}
         <Stack.Screen
           name="VocabularyDetail"
-          component={() => <PlaceholderScreen title="Word Details" />}
+          component={VocabularyDetailScreen}
           options={{
             animation: 'slide_from_right',
           }}
@@ -310,7 +312,7 @@ export function AppNavigator(): React.JSX.Element {
         />
         <Stack.Screen
           name="ReaderSettings"
-          component={() => <PlaceholderScreen title="Reader Settings" />}
+          component={ReaderSettingsScreen}
           options={{
             animation: 'slide_from_right',
           }}
@@ -367,22 +369,6 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#6b7280',
     fontSize: 16,
-  },
-  placeholder: {
-    alignItems: 'center',
-    backgroundColor: '#f3f4f6',
-    flex: 1,
-    justifyContent: 'center',
-  },
-  placeholderSubtext: {
-    color: '#9ca3af',
-    fontSize: 14,
-    marginTop: 8,
-  },
-  placeholderText: {
-    color: '#1f2937',
-    fontSize: 24,
-    fontWeight: '600',
   },
   tabBarLabel: {
     fontSize: 11,

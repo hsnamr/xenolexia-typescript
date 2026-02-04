@@ -1,9 +1,26 @@
 /**
  * Statistics Store - Manages reading and learning statistics
+ * Persists stats, sessions, and review stats to AsyncStorage.
  */
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {create} from 'zustand';
 import type {ReadingStats, ReadingSession} from '@types/index';
+
+const STATISTICS_KEY = '@xenolexia/statistics';
+const MAX_PERSISTED_SESSIONS = 200;
+
+/** Session as stored (dates as ISO strings) */
+interface SerializedSession {
+  id: string;
+  bookId: string;
+  startedAt: string;
+  endedAt: string | null;
+  pagesRead: number;
+  wordsRevealed: number;
+  wordsSaved: number;
+  duration: number;
+}
 
 const defaultStats: ReadingStats = {
   totalBooksRead: 0,
@@ -44,6 +61,7 @@ interface StatisticsState {
   recordReviewSession: (data: ReviewSessionData) => void;
   updateStats: (updates: Partial<ReadingStats>) => void;
   loadStats: () => Promise<void>;
+  saveStats: () => Promise<void>;
   refreshStats: () => Promise<void>;
   resetDailyStats: () => void;
 }
@@ -117,6 +135,7 @@ export const useStatisticsStore = create<StatisticsState>((set, get) => ({
         ? {...state.currentSession, wordsRevealed: state.currentSession.wordsRevealed + 1}
         : null,
     }));
+    get().saveStats();
   },
 
   recordWordSaved: () => {
@@ -130,6 +149,7 @@ export const useStatisticsStore = create<StatisticsState>((set, get) => ({
         ? {...state.currentSession, wordsSaved: state.currentSession.wordsSaved + 1}
         : null,
     }));
+    get().saveStats();
   },
 
   recordReviewSession: (data: ReviewSessionData) => {
@@ -141,22 +161,42 @@ export const useStatisticsStore = create<StatisticsState>((set, get) => ({
         reviewsToday: state.reviewStats.reviewsToday + data.cardsReviewed,
       },
     }));
-    // TODO: Persist to database
+    get().saveStats();
   },
 
   updateStats: (updates: Partial<ReadingStats>) => {
     set(state => ({
       stats: {...state.stats, ...updates},
     }));
+    get().saveStats();
   },
 
   loadStats: async () => {
     set({isLoading: true});
     try {
-      // TODO: Load from database
-      // const stats = await StorageService.getStats();
-      // const sessions = await StorageService.getRecentSessions();
-      // set({ stats, sessions, isLoading: false });
+      const stored = await AsyncStorage.getItem(STATISTICS_KEY);
+      if (stored) {
+        const data = JSON.parse(stored) as {
+          stats?: Partial<ReadingStats>;
+          sessions?: SerializedSession[];
+          reviewStats?: {
+            totalReviews: number;
+            totalCorrect: number;
+            totalTimeSpent: number;
+            reviewsToday: number;
+          };
+        };
+        const sessions: ReadingSession[] = (data.sessions ?? []).map(s => ({
+          ...s,
+          startedAt: new Date(s.startedAt),
+          endedAt: s.endedAt ? new Date(s.endedAt) : null,
+        }));
+        set({
+          stats: {...defaultStats, ...data.stats},
+          sessions,
+          reviewStats: data.reviewStats ?? get().reviewStats,
+        });
+      }
       set({isLoading: false});
     } catch (error) {
       console.error('Failed to load stats:', error);
@@ -164,8 +204,26 @@ export const useStatisticsStore = create<StatisticsState>((set, get) => ({
     }
   },
 
+  saveStats: async () => {
+    try {
+      const {stats, sessions, reviewStats} = get();
+      const sessionsToSave = sessions
+        .slice(-MAX_PERSISTED_SESSIONS)
+        .map(s => ({
+          ...s,
+          startedAt: s.startedAt.toISOString(),
+          endedAt: s.endedAt ? s.endedAt.toISOString() : null,
+        }));
+      await AsyncStorage.setItem(
+        STATISTICS_KEY,
+        JSON.stringify({stats, sessions: sessionsToSave, reviewStats}),
+      );
+    } catch (error) {
+      console.error('Failed to save stats:', error);
+    }
+  },
+
   refreshStats: async () => {
-    // Alias for loadStats - used for pull-to-refresh
     await get().loadStats();
   },
 
@@ -177,5 +235,6 @@ export const useStatisticsStore = create<StatisticsState>((set, get) => ({
         wordsSavedToday: 0,
       },
     }));
+    get().saveStats();
   },
 }));
