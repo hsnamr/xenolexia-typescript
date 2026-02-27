@@ -33,10 +33,17 @@ const babelLoaderConfiguration = {
   },
 };
 
-// Image loader configuration
+// Image loader configuration (emit as separate files; app_logo.png excluded - see appLogoInlineRule)
 const imageLoaderConfiguration = {
   test: /\.(gif|jpe?g|png|svg)$/,
+  exclude: /app_logo\.png$/,
   type: 'asset/resource',
+};
+
+// Inline app logo so it works in Electron (no separate file request)
+const appLogoInlineRule = {
+  test: /app_logo\.png$/,
+  type: 'asset/inline',
 };
 
 // Font loader configuration
@@ -90,6 +97,7 @@ module.exports = {
         },
       },
       babelLoaderConfiguration,
+      appLogoInlineRule,
       imageLoaderConfiguration,
       fontLoaderConfiguration,
       cssLoaderConfiguration,

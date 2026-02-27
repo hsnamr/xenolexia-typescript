@@ -10,6 +10,10 @@ import './AboutScreen.css';
 const APP_VERSION = '1.0.0';
 const BUILD_NUMBER = '1';
 
+// Logo: webpack inlines app_logo.png as base64 (see webpack.config.js appLogoInlineRule)
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const LOGO_IMAGE = require('../app_logo.png') as string;
+
 const LINKS = {
   privacy: 'https://xenolexia.app/privacy',
   terms: 'https://xenolexia.app/terms',
@@ -54,7 +58,7 @@ export function AboutScreen(): React.JSX.Element {
       <div className="about-content">
         {/* App Info */}
         <div className="about-app-info">
-          <div className="about-app-icon">📚</div>
+          <img src={LOGO_IMAGE} alt="Xenolexia" className="about-app-icon about-app-logo" />
           <h2 className="about-app-name">Xenolexia</h2>
           <p className="about-app-version">Version {APP_VERSION} ({BUILD_NUMBER})</p>
           <p className="about-app-tagline">Learn languages through reading</p>
